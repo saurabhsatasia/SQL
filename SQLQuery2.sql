@@ -49,3 +49,19 @@ SELECT * FROM Opportunities_Data WHERE Est_Opportunity_Value < '50000'
 SELECT * FROM Opportunities_Data WHERE Est_Opportunity_Value BETWEEN '50000' AND '70000'
 
 
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------- WHERE CLAUSE with SubQueries ----------------------------------
+-------------------------------------------------------------------------------------------------------------------
+
+SELECT * FROM account_lookup
+SELECT * FROM Opportunities_Data
+SELECT * FROM Calendar_lookup
+
+-- Exm 1 - 1 condition from another table
+SELECT * FROM Opportunities_Data WHERE New_Account_No IN (SELECT New_Account_No FROM account_lookup WHERE Sector = 'Banking')
+
+-- Exm 2 - 1 condition from another table - FY20
+SELECT * FROM Opportunities_Data WHERE Est_Completion_Month_ID IN (SELECT Month_ID FROM Calendar_lookup WHERE Fiscal_Year = 'FY20')
+
+-- Exm 3 - 1 condition from another table - FY20 & 1 Condition
+SELECT * FROM Opportunities_Data WHERE Est_Completion_Month_ID IN (SELECT Month_ID FROM Calendar_lookup WHERE Fiscal_Year = 'FY20') AND Est_Opportunity_Value=50000
