@@ -65,3 +65,7 @@ SELECT * FROM Opportunities_Data WHERE Est_Completion_Month_ID IN (SELECT Month_
 
 -- Exm 3 - 1 condition from another table - FY20 & 1 Condition
 SELECT * FROM Opportunities_Data WHERE Est_Completion_Month_ID IN (SELECT Month_ID FROM Calendar_lookup WHERE Fiscal_Year = 'FY20') AND Est_Opportunity_Value=50000
+
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------- IIF & Case Statements in SQL------------------------------------
+-------------------------------------------------------------------------------------------------------------------
