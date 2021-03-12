@@ -69,3 +69,84 @@ SELECT * FROM Opportunities_Data WHERE Est_Completion_Month_ID IN (SELECT Month_
 -------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------- IIF & Case Statements in SQL------------------------------------
 -------------------------------------------------------------------------------------------------------------------
+
+-- Exm 1: 1 IIF Condition - same column names
+SELECT * FROM Opportunities_Data
+SELECT New_Account_No, Opportunity_ID, New_Opportunity_Name,Est_Completion_Month_ID, 
+		IIF(Product_Category = 'Services', 'Services & Marketing', Product_Category) AS Product_Category,
+		Opportunity_Stage, Est_Opportunity_Value FROM Opportunities_Data
+
+-- Exm 2: Multible iif statements with a new column
+SELECT * FROM
+	(
+	SELECT *,
+	IIF(New_Opportunity_Name LIKE '%Phase - 1%', 'Phase - 1',
+	IIF(New_Opportunity_Name LIKE '%Phase - 2%', 'Phase - 2',
+	IIF(New_Opportunity_Name LIKE '%Phase - 3%', 'Phase - 3',
+	IIF(New_Opportunity_Name LIKE '%Phase - 4%', 'Phase - 4',
+	IIF(New_Opportunity_Name LIKE '%Phase - 5%', 'Phase - 5', 'Need Mapping'))))) AS Oppor_Phase
+	FROM Opportunities_Data
+	) a
+WHERE Oppor_Phase = 'Need Mapping'
+
+-- Exm 1: Case 
+SELECT New_Account_No, Opportunity_ID, New_Opportunity_Name, Est_Completion_Month_ID,
+CASE
+	WHEN Product_Category = 'Services' THEN 'Services & Marketing'
+	ELSE Product_Category
+	END AS Product_Category,
+Opportunity_Stage, Est_Opportunity_Value FROM Opportunities_Data
+
+-- Exm 2: CASE with multible conditions
+SELECT *,
+CASE
+	WHEN New_Opportunity_Name LIKE '%Phase - 1%' THEN 'Phase - 1'
+	WHEN New_Opportunity_Name LIKE '%Phase - 2%' THEN 'Phase - 2'
+	WHEN New_Opportunity_Name LIKE '%Phase - 3%' THEN 'Phase - 3'
+	WHEN New_Opportunity_Name LIKE '%Phase - 4%' THEN 'Phase - 4'
+	WHEN New_Opportunity_Name LIKE '%Phase - 5%' THEN 'Phase - 5'
+	ELSE 'Need Mapping' 
+	END AS Oppor_Phase
+FROM Opportunities_Data
+
+-------------------------------------------------------------------------------------------------------------------
+---------------------------------------- UPDATE / REPLACE / INSERT INTO / DELETE-----------------------------------
+-------------------------------------------------------------------------------------------------------------------
+
+SELECT * FROM account_lookup
+
+--Exm 1: renaming a column value
+SELECT *, 
+IIF(Sector = 'Capital Markets/Securities', 'Capital Markets',
+IIF(Sector = 'Government Social Programs', 'Gov Social',
+IIF(Sector = 'Broadcasters', 'Broadcasters/Media', Sector))) AS Sector2 
+FROM account_lookup
+-- To update these values in original table
+UPDATE account_lookup
+SET Sector = IIF(Sector = 'Capital Markets/Securities', 'Capital Markets',
+			 IIF(Sector = 'Government Social Programs', 'Gov Social',
+			 IIF(Sector = 'Broadcasters', 'Broadcasters/Media', Sector)))
+
+--Exm 2: Replace
+SELECT *, 
+IIF(Sector = 'Capital Markets/Securities', 'Capital Markets',
+IIF(Sector = 'Government Social Programs', 'Gov Social',
+IIF(Sector = 'Broadcasters', 'Broadcasters/Media', Sector))) AS Sector2,
+REPLACE(Account_Segment, 'PS', 'Public Sector') AS Account_Segment2
+FROM account_lookup
+
+UPDATE account_lookup
+SET Account_Segment = REPLACE(Account_Segment, 'PS', 'Public Sector')
+
+-- Exm 3: INSERT INTO
+INSERT INTO account_lookup
+SELECT '9974829689', 'New Account Name', 'Test Industry', NULL, NULL, NULL, NULL, 'SS'
+
+SELECT * FROM account_lookup WHERE Industry_Manager = 'SS'
+
+-- Exm 4: deleting data
+DELETE FROM account_lookup WHERE Industry_Manager = 'SS'
+
+
+
+
