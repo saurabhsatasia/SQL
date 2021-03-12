@@ -148,5 +148,107 @@ SELECT * FROM account_lookup WHERE Industry_Manager = 'SS'
 DELETE FROM account_lookup WHERE Industry_Manager = 'SS'
 
 
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------- Main Aggregate Functions in SQL---------------------------------
+-------------------------------------------------------------------------------------------------------------------
+
+SELECT * FROM Opportunities_Data
+
+-- Exm 1: SUM - 1 COLUMN
+SELECT Product_Category, SUM(Est_Opportunity_Value) AS sum_oppor_value FROM Opportunities_Data
+WHERE Opportunity_Stage = 'Stage - 5'
+GROUP BY Product_Category 
+
+-- Exm 2: SUM - 2 COLUMNS
+SELECT Product_Category, Opportunity_Stage, SUM(Est_Opportunity_Value) FROM Opportunities_Data
+GROUP BY Product_Category, Opportunity_Stage
+ORDER BY Product_Category, Opportunity_Stage 
+
+-- Exm 3: SUM - Order by Value
+SELECT Product_Category, Opportunity_Stage, SUM(Est_Opportunity_Value) FROM Opportunities_Data
+GROUP BY Product_Category, Opportunity_Stage
+ORDER BY SUM(Est_Opportunity_Value) DESC
+
+-- Exm 4: COUNT - 1 COLUMN
+SELECT Product_Category, COUNT(Opportunity_ID) AS No_Of_Opportunities FROM Opportunities_Data
+GROUP BY Product_Category
+ORDER BY COUNT(Opportunity_ID)
+
+-- Exm 5: MIN
+SELECT Product_Category, MIN(Est_Opportunity_Value) as MIN_Est_Opportunity_Value FROM Opportunities_Data
+GROUP BY Product_Category
+
+-- Exm 6: MAX
+SELECT Product_Category, MAX(Est_Opportunity_Value) as MAX_Est_Opportunity_Value FROM Opportunities_Data
+GROUP BY Product_Category 
+
+SELECT * FROM Opportunities_Data WHERE Est_Opportunity_Value = 1000000
+
+-------------------------------------------------------------------------------------------------------------------
+----------------------- INNER/LEFT(OUTER)/RIGHT(OUTER)/FULL/CROSS join Statements in SQL---------------------------
+-------------------------------------------------------------------------------------------------------------------
+SELECT * FROM Opportunities_Data
+SELECT * FROM account_lookup
+
+-- Exm 1: LEFT JOIN
+
+-- 1. We need to SELECT the columns we need from the 2 or more tables we are going to JOIN
+-- 2. Need to identify the column(s) that are identical in each table so we can JOIN them
+-- 3. Need to specify on top which columns we need from each table
+SELECT opportunities.*, accounts.New_Account_Name, accounts.Industry 
+FROM
+	(
+	SELECT New_Account_No, Opportunity_ID, New_Opportunity_Name, Est_Completion_Month_ID, Product_Category, Opportunity_Stage, Est_Opportunity_Value FROM Opportunities_Data
+	) opportunities
+
+	LEFT JOIN
+	(
+	SELECT New_Account_No, New_Account_Name, Industry FROM account_lookup
+	) accounts
+	ON opportunities.New_Account_No = accounts.New_Account_No
+
+SELECT DISTINCT New_Account_No FROM Opportunities_Data --1,139
+SELECT DISTINCT New_Account_No FROM account_lookup -- 1,445
+
+SELECT * FROM account_lookup WHERE New_Account_No NOT IN (SELECT DISTINCT New_Account_No FROM Opportunities_Data) --1,139)
+--984131730
+
+---Also but messy
+SELECT a.*, b.New_Account_Name, b.Industry FROM Opportunities_Data a
+LEFT JOIN account_lookup b
+ON a.New_Account_No = b.New_Account_No
+---------------
+
+-- Exm 2: FULL JOIN
+SELECT opportunities.*, accounts.New_Account_Name, accounts.Industry 
+FROM
+	(
+	SELECT New_Account_No, Opportunity_ID, New_Opportunity_Name, Est_Completion_Month_ID, Product_Category, Opportunity_Stage, Est_Opportunity_Value FROM Opportunities_Data
+	) opportunities
+
+	FULL JOIN
+	(
+	SELECT New_Account_No, New_Account_Name, Industry FROM account_lookup
+	) accounts
+	ON opportunities.New_Account_No = accounts.New_Account_No
+	-- BEFORE: 4,133
+	-- NOW: 4,139 
+	-- Here new records added from accounts table will have null values, 
+
+SELECT ISNULL(o.New_Account_No, ac.New_Account_No) AS New_Account_No,
+ISNULL(o.Opportunity_ID, 'No Opportunity') AS Opportunity_ID,
+o.New_Opportunity_Name, o.Est_Completion_Month_ID, o.Product_Category, o.Opportunity_Stage, o.Est_Opportunity_Value ,
+ac.New_Account_Name, ac.Industry
+FROM
+	(
+	SELECT New_Account_No, Opportunity_ID, New_Opportunity_Name, Est_Completion_Month_ID, Product_Category, Opportunity_Stage, Est_Opportunity_Value FROM Opportunities_Data
+	) o
+
+	FULL JOIN
+	(
+	SELECT New_Account_No, New_Account_Name, Industry FROM account_lookup
+	) ac
+	ON o.New_Account_No = ac.New_Account_No
+ -- 198169344	No Opportunity	NULL	NULL	NULL	NULL	NULL	Voice Caption Center FursKips	Professional Services
 
 
